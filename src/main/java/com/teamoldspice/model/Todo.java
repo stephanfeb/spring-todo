@@ -1,11 +1,22 @@
 package com.teamoldspice.model;
 
-/**
- * Created by neo on 1/3/16.
- */
+import javax.persistence.*;
+
+@Entity
 public class Todo {
-    String name;
-    Boolean completed = false;
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private long id;
+    private String name;
+    private Boolean completed = false;
+
+    protected Todo(){}
+
+    public Todo(String name, Boolean completed) {
+        this.name = name;
+        this.completed = completed;
+    }
 
     public String getName() {
         return name;
