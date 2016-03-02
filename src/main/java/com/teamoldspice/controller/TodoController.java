@@ -18,7 +18,6 @@ import java.util.ArrayList;
 public class TodoController {
 
     public static final String INDEX_VIEW = "index";
-    public static final String _VIEW = "index";
 
     @Autowired
     TodoRepository repository;
