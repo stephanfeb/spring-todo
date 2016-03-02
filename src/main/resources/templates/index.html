@@ -1,16 +1,28 @@
 <h2>Todo App</h2>
 
+<ul>
+    <li><a href="/todo">Create</a></li>
+</ul>
+
 <table>
     <thead>
         <tr>
             <th>Name</th>
             <th>Completed</th>
+            <th></th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
         <tr th:each="todo : ${todoList}">
             <td th:text="${todo.getName()}"></td>
             <td th:text="${todo.getCompleted()}"></td>
+            <td>
+                <a th:href="@{/todo/edit/{id}(id=(${todo.getId()}))}">Update</a>
+            </td>
+            <td>
+                <a th:href="@{/todo/delete/{id}(id=(${todo.getId()}))}">Delete</a>
+            </td>
         </tr>
     </tbody>
 </table>

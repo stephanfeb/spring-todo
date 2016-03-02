@@ -11,11 +11,19 @@ public class Todo {
     private String name;
     private Boolean completed = false;
 
-    protected Todo(){}
+    public Todo(){}
 
     public Todo(String name, Boolean completed) {
         this.name = name;
         this.completed = completed;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {

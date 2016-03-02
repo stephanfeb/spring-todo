@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Create Todo</title>
+</head>
+<body>
+    <h2>Create a Todo</h2>
+    <form action="#" th:action="@{/todo}" th:object="${todo}"  method="post">
+        <input type="hidden" th:field="*{id}" />
+        <fieldset>
+            <label for="name">Name:</label>
+            <input id="name" type="text" placeholder="Buy milk" th:field="*{name}"/>
+        </fieldset>
+        <fieldset>
+            <label for="completed">Completed?:</label>
+            <input type="checkbox" name="completed" id="completed" th:checked="*{completed}"/>
+        </fieldset>
+        <fieldset>
+            <input type="submit" value="Create" />
+        </fieldset>
+    </form>
+</body>
+</html>
