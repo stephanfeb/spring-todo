@@ -1,9 +1,10 @@
 package com.teamoldspice.controller;
 
 import com.teamoldspice.model.Todo;
-import com.teamoldspice.repository.TodoRepository;
+import com.teamoldspice.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -11,49 +12,56 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.util.ArrayList;
-
 @Controller
 @EnableAutoConfiguration
 public class TodoController {
 
-    public static final String INDEX_VIEW = "index";
+    public static final String INDEX_VIEW = "todo/index";
+    public static final String CREATE_VIEW = "todo/create";
 
     @Autowired
-    TodoRepository repository;
+    PersonService personService;
 
     @RequestMapping("/")
+    @Secured("ROLE_USER")
     public String index(Model model) {
-        model.addAttribute("todoList", repository.findAllByOrderByIdAsc());
+
+        model.addAttribute("todoList", personService.findAllTodos());
         return INDEX_VIEW;
     }
 
+    @Secured("ROLE_USER")
     @RequestMapping(value="/todo", method= RequestMethod.GET)
     public String createForm(Model model) {
         model.addAttribute("todo", new Todo());
-        return "create";
+        return CREATE_VIEW;
     }
 
+    @Secured("ROLE_USER")
     @RequestMapping(value="/todo", method= RequestMethod.POST)
     public String submitForm(@ModelAttribute Todo todo, Model model) {
-        repository.save(todo);
-        return index(model);
-    }
 
-    @RequestMapping(value="/todo/edit/{id}")
-    public String edit(@PathVariable("id") Integer id, Model model){
-        Todo todo = repository.findOne(id.longValue());
-        model.addAttribute("todo", todo);
-        return "create";
-    }
-
-    @RequestMapping(value="/todo/delete/{id}")
-    public String delete(@PathVariable("id") Integer id){
-        if(repository.exists(id.longValue()))
-            repository.delete(id.longValue());
-
+        personService.saveTodo(todo);
         return "redirect:/";
     }
 
+    @Secured("ROLE_USER")
+    @RequestMapping(value="/todo/edit/{id}")
+    public String edit(@PathVariable("id") Integer id, Model model){
+
+        Todo todo = personService.findTodo(id);
+
+        model.addAttribute("todo", todo);
+        return CREATE_VIEW;
+    }
+
+    @Secured("ROLE_USER")
+    @RequestMapping(value="/todo/delete/{id}")
+    public String delete(@PathVariable("id") Integer id){
+
+        personService.deleteTodo(id);
+
+        return "redirect:/";
+    }
 
 }

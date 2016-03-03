@@ -1,0 +1,10 @@
+
+<div th:each="user : ${userList}">
+    <div th:text="${user.getUsername()}"></div>
+</div>
+
+
+<form  class="form-inline" action="/logout" method="post">
+    <input type="submit" value="Log out" />
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+</form>
