@@ -1,9 +1,11 @@
 package com.teamoldspice.controller;
 
+import com.teamoldspice.exception.ResourceNotFoundException;
 import com.teamoldspice.model.Todo;
 import com.teamoldspice.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,6 +35,7 @@ public class TodoController {
     @Secured("ROLE_USER")
     @RequestMapping(value="/todo", method= RequestMethod.GET)
     public String createForm(Model model) {
+
         model.addAttribute("todo", new Todo());
         return CREATE_VIEW;
     }
@@ -47,9 +50,10 @@ public class TodoController {
 
     @Secured("ROLE_USER")
     @RequestMapping(value="/todo/edit/{id}")
-    public String edit(@PathVariable("id") Integer id, Model model){
+    public String edit(@PathVariable("id") Integer id, Model model) {
 
         Todo todo = personService.findTodo(id);
+        if (null == todo) throw new ResourceNotFoundException();
 
         model.addAttribute("todo", todo);
         return CREATE_VIEW;
@@ -63,5 +67,4 @@ public class TodoController {
 
         return "redirect:/";
     }
-
 }

@@ -20,7 +20,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
     @Override
     protected  void configure(HttpSecurity security) throws  Exception {
-        security.authorizeRequests().antMatchers("/css/**").permitAll()
+        security.authorizeRequests().antMatchers( "/beans/**", "/css/**", "/js/**").permitAll()
+                .antMatchers("/signup/**").hasAnyRole("USER", "ANONYMOUS")
                 .anyRequest().fullyAuthenticated()
                 .and()
                 .formLogin()

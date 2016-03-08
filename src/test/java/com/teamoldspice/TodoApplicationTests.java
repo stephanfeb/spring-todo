@@ -10,9 +10,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @SpringApplicationConfiguration(classes = TodoApplication.class)
 @WebAppConfiguration
 public class TodoApplicationTests {
-
 	@Test
 	public void contextLoads() {
+
 	}
 
 }

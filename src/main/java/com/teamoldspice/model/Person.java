@@ -1,17 +1,10 @@
 package com.teamoldspice.model;
 
-import org.hibernate.annotations.*;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.data.repository.cdi.Eager;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-
 import javax.persistence.*;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OrderBy;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -24,6 +17,15 @@ public class Person{
     private String username;
     private String password;
     private Boolean enabled = true;
+
+    public Person(){}
+
+    public Person(String username, String password){
+        this.username = username;
+        this.password = password;
+        this.enabled = true;
+    }
+
 
     public Long getId() {
         return id;
@@ -57,11 +59,11 @@ public class Person{
         this.enabled = enabled;
     }
 
-    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    public Set<Authority> roles;
+    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    public Set<Authority> roles = new HashSet<>();
 
     @OneToMany()
     @JoinColumn(name="PERSON_ID")
     @OrderBy("ID ASC")
-    public Set<Todo> todos;
+    public Set<Todo> todos = new HashSet<>();
 }

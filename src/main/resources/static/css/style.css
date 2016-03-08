@@ -1,0 +1,8 @@
+body {
+  font-family: sans-serif;
+}
+
+.field-label {
+  width: 200px;
+  display: inline-block;
+}

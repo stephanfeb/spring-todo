@@ -4,20 +4,22 @@ import com.teamoldspice.model.Authority;
 import com.teamoldspice.model.CustomUserDetail;
 import com.teamoldspice.model.Person;
 import com.teamoldspice.model.Todo;
+import com.teamoldspice.repository.AuthorityRepository;
 import com.teamoldspice.repository.TodoRepository;
 import com.teamoldspice.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.WebApplicationContext;
+import sun.security.util.AuthResources;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class PersonService {
@@ -29,30 +31,42 @@ public class PersonService {
     TodoRepository todoRepository;
 
     @Autowired
+    AuthorityRepository authorityRepository;
+
+    @Autowired
     PersonRepository personRepository;
 
     /*
     * Retrieve the currently authenticated user
     * */
-    private Person getAuthUser(){
+    private Optional<Person> getAuthUser(){
 
-        CustomUserDetail userDetail = (CustomUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Authentication authObj = SecurityContextHolder.getContext().getAuthentication();
+
+        if (null == authObj) return Optional.empty();
+
+        User userDetail = (User) authObj.getPrincipal();
 
         return personRepository.findOneByUsername(userDetail.getUsername());
     }
 
     public void createUser(Person newPerson){
 
-        Person existingPerson = personRepository.findOneByUsername(newPerson.getUsername());
+        Optional<Person> existingPerson = personRepository.findOneByUsername(newPerson.getUsername());
 
-        if (null == existingPerson){
+        if (!existingPerson.isPresent()){
+
             //create a new user account
             newPerson.setPassword(passwordEncoder.encode(newPerson.getPassword()));
-            personRepository.save(newPerson);
+            Authority auth = authorityRepository.findOneByAuthority("ROLE_USER").get();
+            newPerson.roles.add(auth);
+            Person savedPerson = personRepository.saveAndFlush(newPerson);
+
         }else{
+
             //update an existing user account
-            newPerson.setId(existingPerson.getId());
-            newPerson.setPassword(passwordEncoder.encode(existingPerson.getPassword()));
+            newPerson.setId(existingPerson.get().getId());
+            newPerson.setPassword(passwordEncoder.encode(existingPerson.get().getPassword()));
             personRepository.save(newPerson);
         }
     }
@@ -73,15 +87,20 @@ public class PersonService {
 
     /*Returns todos for currently authenticated user*/
     public Set<Todo> findAllTodos(){
-        return getAuthUser().todos;
+        return getAuthUser()
+                .map(person -> person.todos)
+                .orElseGet(HashSet<Todo>::new);
     }
 
     public void saveTodo(Todo todo){
         todoRepository.save(todo);
 
-        Person person = getAuthUser();
-        person.todos.add(todo);
-        personRepository.save(person);
+        Optional<Person> optPerson= getAuthUser();
+        optPerson.map(person -> {
+            person.todos.add(todo);
+            personRepository.save(person);
+            return person;
+        });
     }
 
     public Todo findTodo(Integer id){

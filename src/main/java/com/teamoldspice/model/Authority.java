@@ -1,14 +1,21 @@
 package com.teamoldspice.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
-public class Authority {
+public class Authority implements Serializable{
 
     @Id
     @Column(name="AUTHORITY_ID")
     private Long id;
     private String authority;
+
+    public Authority(){}
+
+    public Authority(String role){
+        this.authority = role;
+    }
 
     public Long getId() {
         return id;
@@ -26,7 +33,18 @@ public class Authority {
         this.authority = authority;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Authority)) return false;
+
+        Authority authority1 = (Authority) o;
+
+        return getAuthority().equals(authority1.getAuthority());
+    }
+
+
 //    @ManyToOne
 //    @JoinColumn(name="PERSON_ID")
-//    private Person owner;
+//    public Person owner;
 }
