@@ -1,6 +1,8 @@
 package com.teamoldspice.controller;
 
 import com.gargoylesoftware.htmlunit.WebClient;
+import com.github.springtestdbunit.DbUnitTestExecutionListener;
+import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.teamoldspice.SecurityContextFactory;
 import com.teamoldspice.TodoApplication;
 import com.teamoldspice.model.CustomUserDetail;
@@ -63,8 +65,12 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = TodoApplication.class)
 @WebAppConfiguration
-@Transactional
 @IntegrationTest("server.port:9000")
+@DatabaseSetup("classpath:testData.xml")
+@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
+        DirtiesContextTestExecutionListener.class,
+        TransactionalTestExecutionListener.class,
+        DbUnitTestExecutionListener.class })
 public class PersonControllerIntegrationTest extends FluentTest{
 
     @Autowired
