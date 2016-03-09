@@ -17,7 +17,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +59,7 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.fluentlenium.assertj.FluentLeniumAssertions.assertThat;
@@ -85,32 +89,29 @@ public class PersonControllerIntegrationTest extends FluentTest{
     @Autowired
     WebApplicationContext wac;
 
-    private HtmlUnitDriver webDriver;
-
-    private WebClient webClient;
-
     public AuthorityRepository getAuthorityRepository() {
         return authorityRepository;
     }
 
     @Before
     public void setUp(){
-//        webDriver = MockMvcHtmlUnitDriverBuilder.webAppContextSetup(wac, SecurityMockMvcConfigurers.springSecurity()).build();
+        //SecurityContextHolder.clearContext();
+        TestSecurityContextHolder.clearContext();
+        getDriver().manage().deleteAllCookies();
     }
 
     @After
     public void after() {
-        SecurityContextHolder.clearContext();
     }
 
     public void login(){
-        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_THREADLOCAL);
+        //SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_THREADLOCAL);
 
         List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken("test_user", "password", authorities);
 
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        TestSecurityContextHolder.getContext().setAuthentication(authenticationToken);
     }
 
     @Override
@@ -129,16 +130,17 @@ public class PersonControllerIntegrationTest extends FluentTest{
 
     @Test
     public void showLoginPage_WhenNotAuthenticated(){
-        SecurityContextHolder.getContext().setAuthentication(null);
 
         goTo("http://localhost:9000/person/list");
+
+        WebElement el = getDriver().findElement(By.id("username"));
+        assertThat(el).isNotNull();
 
         assertTrue(find("input", withName("username")).size() == 1);
         assertTrue(find("input", withName("password")).size() == 1);
     }
 
     @Test
-    @DirtiesContext
     public void showUserListWhenAuthenticated() throws Exception{
         login();
 
@@ -148,7 +150,6 @@ public class PersonControllerIntegrationTest extends FluentTest{
     }
 
     @Test
-    @DirtiesContext
     public void showUsernameOnUserProfilePage() {
         login();
 
