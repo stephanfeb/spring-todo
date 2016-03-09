@@ -2,6 +2,9 @@ package com.teamoldspice.config;
 
 import com.teamoldspice.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,6 +20,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
     @Autowired
     CustomUserDetailsService userDetailsService;
+
+//    @Autowired
+//    DaoAuthenticationProvider authenticationProvider;
 
     @Override
     protected  void configure(HttpSecurity security) throws  Exception {
@@ -35,6 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception{
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
+//        auth.authenticationProvider(authenticationProvider);
     }
 
 }

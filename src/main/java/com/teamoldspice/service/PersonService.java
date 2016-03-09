@@ -14,6 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.WebApplicationContext;
@@ -45,9 +46,15 @@ public class PersonService {
 
         if (null == authObj) return Optional.empty();
 
-        User userDetail = (User) authObj.getPrincipal();
+        //User userDetail = (User) authObj.getPrincipal();
+        Object principal = authObj.getPrincipal();
 
-        return personRepository.findOneByUsername(userDetail.getUsername());
+        if (principal instanceof UserDetails){
+            return personRepository.findOneByUsername(((UserDetails)principal).getUsername());
+        }else{
+            return personRepository.findOneByUsername(principal.toString());
+        }
+
     }
 
     public void createUser(Person newPerson){
