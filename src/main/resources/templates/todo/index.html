@@ -4,7 +4,7 @@
             <h2>Todo App</h2>
 
             <ul>
-                <li><a href="/todo">Create</a></li>
+                <li><a id="create_todo" href="/todo">Create</a></li>
             </ul>
 
             <table>
@@ -17,14 +17,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="todo : ${todoList}">
+                    <tr name="todo" th:each="todo : ${todoList}">
                         <td th:text="${todo.getName()}"></td>
                         <td th:text="${todo.getCompleted()}"></td>
                         <td>
-                            <a th:href="@{/todo/edit/{id}(id=(${todo.getId()}))}">Update</a>
+                            <a name="update" th:href="@{/todo/edit/{id}(id=(${todo.getId()}))}">Update</a>
                         </td>
                         <td>
-                            <a th:href="@{/todo/delete/{id}(id=(${todo.getId()}))}">Delete</a>
+                            <a name="delete" th:href="@{/todo/delete/{id}(id=(${todo.getId()}))}">Delete</a>
                         </td>
                     </tr>
                 </tbody>
