@@ -1,9 +1,10 @@
 package com.teamoldspice.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
-public class Todo {
+public class Todo implements Serializable{
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)

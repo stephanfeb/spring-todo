@@ -4,11 +4,12 @@ import javax.persistence.*;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OrderBy;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-public class Person{
+public class Person implements Serializable{
     @Id
     @Column(name="PERSON_ID")
     @GeneratedValue(strategy= GenerationType.AUTO)
