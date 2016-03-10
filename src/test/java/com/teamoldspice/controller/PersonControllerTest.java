@@ -42,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = TodoApplication.class)
 @WebAppConfiguration
-@TestExecutionListeners(listeners={ServletTestExecutionListener.class,
+@TestExecutionListeners(inheritListeners = false, listeners={
         DependencyInjectionTestExecutionListener.class,
         DirtiesContextTestExecutionListener.class,
         TransactionalTestExecutionListener.class,
