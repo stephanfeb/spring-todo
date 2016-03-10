@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataset>
     <person person_id="1" enabled="true" username="test_user" password="$2a$10$ZeJNTVjaVJ5f0LbjJJT4q.WzskOz1BITPr919HROFUYjO7FKmBHMy "/>
+    <person person_id="2" enabled="true" username="test_user2" password="$2a$10$ZeJNTVjaVJ5f0LbjJJT4q.WzskOz1BITPr919HROFUYjO7FKmBHMy "/>
 
     <authority authority_id="1" authority="ROLE_USER"/>
 
     <person_roles person_person_id="1" roles_authority_id="1"/>
+    <person_roles person_person_id="2" roles_authority_id="1"/>
+
+    <todo id="1" completed="false" name="buy milk" person_id="1" />
+    <todo id="2" completed="false" name="buy cake" person_id="1" />
+
+    <todo id="3" completed="true" name="buy a cow" person_id="2" />
+    <todo id="4" completed="true" name="buy a goat" person_id="2" />
 </dataset>
 
