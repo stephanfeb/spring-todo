@@ -99,8 +99,8 @@ public class PersonService {
                 .orElseGet(HashSet<Todo>::new);
     }
 
-    public void saveTodo(Todo todo){
-        todoRepository.save(todo);
+    public Todo saveTodo(Todo todo){
+        Todo savedTodo = todoRepository.save(todo);
 
         Optional<Person> optPerson= getAuthUser();
         optPerson.map(person -> {
@@ -108,6 +108,8 @@ public class PersonService {
             personRepository.save(person);
             return person;
         });
+
+        return savedTodo;
     }
 
     public Todo findTodo(Integer id){

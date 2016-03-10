@@ -2,6 +2,7 @@ package com.teamoldspice.controller;
 
 
 import com.teamoldspice.TodoApplication;
+import com.teamoldspice.exception.ResourceNotFoundException;
 import com.teamoldspice.model.Person;
 import com.teamoldspice.model.Todo;
 import com.teamoldspice.repository.PersonRepository;
@@ -12,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -24,9 +26,11 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
 import org.springframework.test.context.web.ServletTestExecutionListener;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -37,7 +41,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = TodoApplication.class)
 @WebAppConfiguration
-@TestExecutionListeners(listeners={ServletTestExecutionListener.class,
+@TestExecutionListeners(inheritListeners = false, listeners={
         DependencyInjectionTestExecutionListener.class,
         DirtiesContextTestExecutionListener.class,
         TransactionalTestExecutionListener.class,
@@ -69,9 +73,15 @@ public class TodoControllerTests {
         mockMvc = webAppContextSetup(wac).build();
     }
 
+    @After
+    public void tearDown(){
+        todo = null;
+    }
+
     @Test
     public void testIndex_RendersIndexView_WithTodoListModel() throws Exception {
-        Todo todo = createTodoWithTestUser();
+        //Todo todo = createTodoWithTestUser();
+        Todo todo = todoRepository.findOne(1L);
 
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
@@ -115,7 +125,7 @@ public class TodoControllerTests {
 
     @Test
     public void testEdit_RendersCreateView_WithTodoModel() throws Exception {
-        Todo todo = createTodoWithTestUser();
+        Todo todo = todoRepository.findOne(1L);
 
         mockMvc.perform(get("/todo/edit/" + todo.getId()))
                 .andExpect(status().isOk())
@@ -124,39 +134,20 @@ public class TodoControllerTests {
     }
 
     @Test
-    public void testEdit_HasErrorOnInvalidId() throws Exception {
-        mockMvc.perform(get("/todo/edit/" + 1))
-                .andExpect(status().isOk())
-                .andExpect(view().name("todo/create"))
-                .andExpect(model().attribute("todo", todo));
-
+    public void testEdit_NotFoundOnInvalidId() throws Exception {
+        mockMvc.perform(get("/todo/edit/" + 100))
+                .andExpect(status().isNotFound());
     }
 
     @Test
     public void testDelete_DestroysTodo_AndRedirectsToIndex() throws Exception {
-        Todo todo = createTodoWithTestUser();
+        Todo todo = todoRepository.findOne(1L);
 
+        long initalCount = todoRepository.count();
         mockMvc.perform(get("/todo/delete/" + todo.getId()))
                 .andExpect(status().isFound())
                 .andExpect(view().name("redirect:/"));
 
-        assertEquals(0, todoRepository.count());
-    }
-
-    private Todo createTodoWithTestUser() {
-        todo = new Todo("some task", false);
-        todo = todoRepository.save(todo);
-
-        person = new Person();
-        person.setUsername("test_user");
-        person.setPassword(passwordEncoder.encode("password"));
-        person.setEnabled(true);
-
-        person = personRepository.save(person);
-
-        person.todos.add(todo);
-        personRepository.save(person);
-
-        return todo;
+        assertEquals(initalCount-1, todoRepository.count());
     }
 }
