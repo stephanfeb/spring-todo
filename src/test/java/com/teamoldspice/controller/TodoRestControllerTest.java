@@ -13,10 +13,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.TestSecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.web.FilterChainProxy;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
@@ -31,10 +36,11 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.springframework.http.converter.json.Jackson2ObjectMapperBuilder.json;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -49,28 +55,42 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class TodoRestControllerTest{
 
     @Autowired
+    FilterChainProxy filterChainProxy;
+
+    @Autowired
     WebApplicationContext wac;
 
     @Autowired
     TodoRepository todoRepository;
 
     private MockMvc mockMvc;
+    private MockHttpSession session;
+
+    private ObjectMapper mapper;
 
     @Before
     public void setUp(){
 
-        mockMvc = webAppContextSetup(wac).build();
+        mockMvc = webAppContextSetup(wac).dispatchOptions(true).addFilters(filterChainProxy).build();
+
+        TestSecurityContextHolder.clearContext();
+
+        session = new MockHttpSession();
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
 
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken("test_user", "password", authorities);
 
         TestSecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+        mapper = new ObjectMapper();
     }
 
     @Test
     public void testListTodo() throws Exception {
-        mockMvc.perform(get("/rest/todo/list"))
+        mockMvc.perform(get("/rest/todo/list")
+                .session(session))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$[0].name", is("buy milk")))
@@ -79,8 +99,9 @@ public class TodoRestControllerTest{
 
     @Test
     public void testCreateTodo() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         mockMvc.perform(post("/rest/todo/create")
+                .session(session)
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(mapper.writeValueAsString(new Todo("hug my owl", false))))
                 .andExpect(status().isOk())
@@ -91,21 +112,23 @@ public class TodoRestControllerTest{
 
     @Test
     public void testUpdateFailsWhenNoTodo() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         mockMvc.perform(post("/rest/todo/update/10000000" )
+                .session(session)
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(mapper.writeValueAsString(new Todo())))
                 .andExpect(status().isNotFound());
     }
 
     @Test
+    @WithMockUser("test_user")
     public void testUpdateTodo() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         Todo todo = todoRepository.findOne(1L);
         todo.setName("hug my owli");
         todo.setCompleted(true);
         mockMvc.perform(post("/rest/todo/update/" + todo.getId())
+                .session(session)
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(mapper.writeValueAsString(todo)))
                 .andExpect(status().isOk())
@@ -116,10 +139,9 @@ public class TodoRestControllerTest{
 
     @Test
     public void testDeleteTodo() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         Todo todo = todoRepository.findOne(1L);
-        mockMvc.perform(get("/rest/todo/delete/" + todo.getId()))
+        mockMvc.perform(get("/rest/todo/delete/" + todo.getId())
+                .session(session))
                 .andExpect(status().isOk());
 
         todo = todoRepository.findOne(1L);
