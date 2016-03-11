@@ -66,7 +66,7 @@ public class PersonControllerTest {
     private PasswordEncoder passwordEncoder;
 
 
-    static final String TEST_USER =  "test_user_1";
+    static final String TEST_USER =  "test_user_1@here.com";
     private MockMvc mockMvc;
 
     @Before

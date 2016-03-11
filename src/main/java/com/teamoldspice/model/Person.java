@@ -1,12 +1,15 @@
 package com.teamoldspice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OrderBy;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 @Entity
 public class Person implements Serializable{
@@ -15,8 +18,13 @@ public class Person implements Serializable{
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
+    @NotNull
+    @Pattern(regexp = ".+@.+")
     private String username;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+
     private Boolean enabled = true;
 
     public Person(){}
@@ -48,6 +56,7 @@ public class Person implements Serializable{
         return password;
     }
 
+    @JsonProperty
     public void setPassword(String password) {
         this.password = password;
     }

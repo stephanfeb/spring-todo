@@ -57,7 +57,7 @@ public class PersonService {
 
     }
 
-    public void createUser(Person newPerson){
+    public Person createUser(Person newPerson) throws Exception{
 
         Optional<Person> existingPerson = personRepository.findOneByUsername(newPerson.getUsername());
 
@@ -67,14 +67,14 @@ public class PersonService {
             newPerson.setPassword(passwordEncoder.encode(newPerson.getPassword()));
             Authority auth = authorityRepository.findOneByAuthority("ROLE_USER").get();
             newPerson.roles.add(auth);
-            Person savedPerson = personRepository.saveAndFlush(newPerson);
+            return personRepository.saveAndFlush(newPerson);
 
         }else{
 
             //update an existing user account
             newPerson.setId(existingPerson.get().getId());
             newPerson.setPassword(passwordEncoder.encode(existingPerson.get().getPassword()));
-            personRepository.save(newPerson);
+            return personRepository.save(newPerson);
         }
     }
 

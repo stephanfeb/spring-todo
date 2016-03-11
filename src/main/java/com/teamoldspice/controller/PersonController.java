@@ -20,8 +20,6 @@ public class PersonController {
     @Autowired
     PersonService personService;
 
-
-
     @RequestMapping("/person/new")
     public String newUser(){
         return "/person/new";
@@ -29,7 +27,7 @@ public class PersonController {
 
     @RequestMapping("/person/save")
     @Secured("ROLE_USER")
-    public String addUser(@ModelAttribute Person newPerson){
+    public String addUser(@ModelAttribute Person newPerson) throws Exception{
 
         personService.createUser(newPerson);
 
@@ -38,7 +36,7 @@ public class PersonController {
 
     @RequestMapping("/person/list")
     @Secured("ROLE_USER")
-    public String listUsers(Model model){
+    public String listUsers(Model model) throws Exception{
 
         List<Person> personList = personService.findAll();
         model.addAttribute("userList", personList);
@@ -60,7 +58,7 @@ public class PersonController {
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
     @Secured("ROLE_USER")
-    public String signup(@ModelAttribute SignupForm signupForm){
+    public String signup(@ModelAttribute SignupForm signupForm) throws Exception{
 
         //todo: 1) validated email, validate passwords
         personService.createUser(new Person(signupForm.getEmail(), signupForm.getPassword()));
