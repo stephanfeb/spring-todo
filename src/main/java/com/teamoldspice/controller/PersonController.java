@@ -5,6 +5,7 @@ import com.teamoldspice.model.SignupForm;
 import com.teamoldspice.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.cloud.security.oauth2.resource.EnableOAuth2Resource;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
