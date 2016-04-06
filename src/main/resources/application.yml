@@ -1,0 +1,44 @@
+debug: true
+server:
+  port: 8080
+
+security:
+  user:
+    password: password
+  ignored: /,/favicon.ico,/index.html,/home.html,/dashboard.html,/js/**,/css/**,/webjars/**
+  sessions: ALWAYS
+  oauth2:
+    sso:
+      loginPath: /dashboard/login
+management:
+  security:
+    role: HERO
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    com.netflix.discovery: 'OFF'
+
+---
+spring:
+  profiles: default
+  datasource:
+    url: jdbc:postgresql://localhost/todo_test
+    username: dbadmin
+    password:
+    driver-class-name: org.postgresql.Driver
+    jpa:
+      hibernate.ddl-auto: update
+      show-sql: true
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
+security:
+  oauth2:
+    client:
+      accessTokenUri: http://localhost:9999/uaa/oauth/token
+      userAuthorizationUri: http://localhost:9999/uaa/oauth/authorize
+      clientId: todo
+      clientSecret: todopassword
+    resource:
+      userInfoUri: http://localhost:9999/uaa/user
+      id: openid
+

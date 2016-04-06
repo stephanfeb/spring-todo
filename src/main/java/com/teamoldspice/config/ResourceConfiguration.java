@@ -20,32 +20,32 @@ import java.util.Arrays;
  * Created by neo on 15/3/16.
  */
 @Configuration
-@EnableOAuth2Client
+//@EnableOAuth2Client
 public class ResourceConfiguration {
 
-
-    @Bean
-    public OAuth2ProtectedResourceDetails todoAuthServerResourceDetails() {
-        AuthorizationCodeResourceDetails details = new AuthorizationCodeResourceDetails();
-        details.setId("auth/server");
-        details.setClientId("todo");
-        details.setClientSecret("todopassword");
-        details.setAccessTokenUri("http://localhost:9999/uaa/oauth/token");
-        details.setUserAuthorizationUri("http://localhost:9999/uaa/oauth/authorize");
-        details.setScope(Arrays.asList("openid"));
-
-        return details;
-    }
+//
+//    @Bean
+//    public OAuth2ProtectedResourceDetails todoAuthServerResourceDetails() {
+//        AuthorizationCodeResourceDetails details = new AuthorizationCodeResourceDetails();
+//        details.setId("auth/server");
+//        details.setClientId("todo");
+//        details.setClientSecret("todopassword");
+//        details.setAccessTokenUri("http://localhost:9999/uaa/oauth/token");
+//        details.setUserAuthorizationUri("http://localhost:9999/uaa/oauth/authorize");
+//        details.setScope(Arrays.asList("openid"));
+//
+//        return details;
+//    }
 
 //    @Bean
 //    public OAuth2RestTemplate todoAuthRestTemplate(OAuth2ClientContext clientContext) {
 //        return new OAuth2RestTemplate(todoAuthServerResourceDetails(), clientContext);
 //    }
-
-    @Bean public OAuth2RestOperations restTemplate() {
-        AccessTokenRequest atr = new DefaultAccessTokenRequest();
-
-        return new OAuth2RestTemplate(todoAuthServerResourceDetails(), new DefaultOAuth2ClientContext(atr));
-    }
+//
+//    @Bean public OAuth2RestOperations restTemplate() {
+//        AccessTokenRequest atr = new DefaultAccessTokenRequest();
+//
+//        return new OAuth2RestTemplate(todoAuthServerResourceDetails(), new DefaultOAuth2ClientContext(atr));
+//    }
 
 }

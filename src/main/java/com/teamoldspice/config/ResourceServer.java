@@ -12,29 +12,28 @@ import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 
 @Configuration
-public class ResourceServer extends ResourceServerConfigurerAdapter{
-    @Override
+public class ResourceServer {
     public void configure(HttpSecurity http) throws Exception {
 //        http.requestMatchers().antMatchers("/rest/**", "/rest/person/**")
 //                .and().authorizeRequests()
 //                .anyRequest().access("#oauth2.hasScope('read')");
 
-        http.authorizeRequests().antMatchers("/rest/**", "/rest/person/**")
-                .authenticated().and()
-                .httpBasic().realmName("TodoApp");
+//        http.authorizeRequests().antMatchers("/rest/**", "/rest/person/**")
+//                .authenticated().and()
+//                .httpBasic().realmName("TodoApp");
     }
 
-    @Override
-    public void configure(ResourceServerSecurityConfigurer resources) throws Exception{
-        resources.resourceId("todos");
-    }
+//    @Override
+//    public void configure(ResourceServerSecurityConfigurer resources) throws Exception{
+//        resources.resourceId("todos");
+//    }
 
-    @Bean
-    public ResourceServerTokenServices tokenService() {
-        RemoteTokenServices tokenServices = new RemoteTokenServices();
-        tokenServices.setClientId("todo");
-        tokenServices.setClientSecret("todopassword");
-        tokenServices.setCheckTokenEndpointUrl("http://localhost:9999/uaa/oauth/check_token");
-        return tokenServices;
-    }
+//    @Bean
+//    public ResourceServerTokenServices tokenService() {
+//        RemoteTokenServices tokenServices = new RemoteTokenServices();
+//        tokenServices.setClientId("todo");
+//        tokenServices.setClientSecret("todopassword");
+//        tokenServices.setCheckTokenEndpointUrl("http://localhost:9999/uaa/oauth/check_token");
+//        return tokenServices;
+//    }
 }
